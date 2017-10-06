@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    .header
+        nav.nav-extended
+            .nav-wrapper
+               a.brand-logo(href='#') Raw&nbsp;Photo&nbsp;Viewer
+    .content
+        .drop-zone
+            .center
+                span.display-block DROP IMAGE HERE OR
+                a.display-block.waves-effect.waves-light.grey.darken-3.btn select from disk
+                a#preview Preview
+                input#fake-button(type="file", accept=".bin")
+        .viewer.hidden
+            canvas#viewer
