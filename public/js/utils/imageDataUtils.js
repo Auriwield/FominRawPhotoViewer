@@ -7,7 +7,7 @@ const canvasUtils = (function () {
     }
 
     function drawIntoCanvas(imageData, canvas, scale) {
-        let ctx = canvas[0].getContext("2d");
+        var ctx = canvas[0].getContext("2d");
         if (!scale) scale = calcScale(imageData);
         canvas[0].width = imageData.width * scale;
         canvas[0].height = imageData.height * scale;
@@ -20,46 +20,50 @@ const canvasUtils = (function () {
         ctx.putImageData(imageData, 0, 0);
     }
 
-    function makeCanvasSquare(canvas, subw = 0, subh = 0) {
-        let maxWidth = $(window).width() * 0.9 - subw;
-        let maxHeight = ($(window).height() - $(".header").height()) * 0.9 - subh;
+    function makeCanvasSquare(canvas, subw, subh) {
+        if (!subw) subw = 0;
+        if (!subh) subh = 0;
 
-        let side = Math.min(maxWidth, maxHeight);
+        var maxWidth = $(window).width() * 0.9 - subw;
+        var maxHeight = ($(window).height() - $(".header").height()) * 0.9 - subh;
+
+        var side = Math.min(maxWidth, maxHeight);
 
         canvas[0].width = side;
         canvas[0].height = side;
     }
 
-    function calcScale(imageData, multiplier = 2) {
-        let maxWidth = $(window).width() / multiplier * 0.9;
-        let maxHeight = ($(window).height() - $(".header").height()) * 0.9;
-        let mpX = maxWidth / imageData.width;
-        let mpY = maxHeight / imageData.height;
+    function calcScale(imageData, multiplier) {
+        if (!multiplier) multiplier = 2;
+        var maxWidth = $(window).width() / multiplier * 0.9;
+        var maxHeight = ($(window).height() - $(".header").height()) * 0.9;
+        var mpX = maxWidth / imageData.width;
+        var mpY = maxHeight / imageData.height;
         return Math.min(mpX, mpY);
     }
 
     function getPrescaledImageData() {
-        let maxWidth = Math.floor($(window).width() * 0.8);
-        let maxHeight = Math.floor(($(window).height() - $(".header").height()) * 0.8);
+        var maxWidth = Math.floor($(window).width() * 0.8);
+        var maxHeight = Math.floor(($(window).height() - $(".header").height()) * 0.8);
         return new ImageData(new Uint8ClampedArray(maxWidth * maxHeight * 4), maxWidth, maxHeight);
     }
 
     function scaleImageData(imageData, scale) {
-        let h1 = imageData.height;
-        let w1 = imageData.width;
-        let w2 = Math.floor(w1 * scale);
-        let h2 = Math.floor(h1 * scale);
+        var h1 = imageData.height;
+        var w1 = imageData.width;
+        var w2 = Math.floor(w1 * scale);
+        var h2 = Math.floor(h1 * scale);
 
-        let srcLength = h1 * w1 * 4;
-        let destLength = w2 * h2 * 4;
+        var srcLength = h1 * w1 * 4;
+        var destLength = w2 * h2 * 4;
 
-        let src = imageData.data;
-        let dest = new Uint8ClampedArray(destLength);
+        var src = imageData.data;
+        var dest = new Uint8ClampedArray(destLength);
 
-        for (let y = 0; y < h2; y++) {
-            for (let x = 0; x < w2; x++) {
-                let x1 = Math.floor(x / scale);
-                let y1 = Math.floor(y / scale);
+        for (var y = 0; y < h2; y++) {
+            for (var x = 0; x < w2; x++) {
+                var x1 = Math.floor(x / scale);
+                var y1 = Math.floor(y / scale);
 
                 if (x1 < 0 || x1 >= w1 || y1 < 0 || y1 >= h1)
                     continue;
@@ -67,14 +71,14 @@ const canvasUtils = (function () {
                 if (x < 0 || x >= w2 || y < 0 || y >= h2)
                     continue;
 
-                let destIndex = (y * w2 + x) * 4;
-                let sourceIndex = (y1 * w1 + x1) * 4;
+                var destIndex = (y * w2 + x) * 4;
+                var sourceIndex = (y1 * w1 + x1) * 4;
 
                 if (destIndex + 3 >= destLength || destIndex < 0
                     || sourceIndex + 3 >= srcLength || sourceIndex < 0) continue;
 
 
-                for (let i = 0; i < 4; i++) {
+                for (var i = 0; i < 4; i++) {
                     dest[destIndex + i] = src[sourceIndex + i];
                 }
             }
@@ -84,23 +88,23 @@ const canvasUtils = (function () {
     }
 
     function applyBorder(imageData, t, color) {
-        let w = imageData.width + t;
-        let h = imageData.height + t;
+        var w = imageData.width + t;
+        var h = imageData.height + t;
 
-        let dest = new Uint8ClampedArray(w * h * 4);
+        var dest = new Uint8ClampedArray(w * h * 4);
 
-        for (let i = 0; i < imageData.height; i++) {
-            for (let j = 0; j < imageData.width; j++) {
-                let srcIndex = (i * imageData.width + j) * 4;
-                let destIndex = ((i + t) * w + j + t) * 4;
-                for (let p = 0; p < 4; p++) {
+        for (var i = 0; i < imageData.height; i++) {
+            for (var j = 0; j < imageData.width; j++) {
+                var srcIndex = (i * imageData.width + j) * 4;
+                var destIndex = ((i + t) * w + j + t) * 4;
+                for (var p = 0; p < 4; p++) {
                     dest[destIndex + p] = imageData.data[srcIndex + p]
                 }
                 destIndex += 4;
             }
         }
 
-        let data = new ImageData(dest, w, h);
+        var data = new ImageData(dest, w, h);
 
         fillRectangle(data, 0, 0, w, t, color);
         fillRectangle(data, 0, t, t, h - t * 2, color);
@@ -111,15 +115,15 @@ const canvasUtils = (function () {
     }
 
     function fillRectangle(imageData, x, y, width, height, color) {
-        let yEnd = y + height;
-        let xEnd = x + width;
+        var yEnd = y + height;
+        var xEnd = x + width;
 
         if (yEnd > imageData.height) yEnd = imageData.height;
         if (xEnd > imageData.width) xEnd = imageData.width;
 
-        for (let i = y; i < yEnd; i++) {
-            for (let j = x; j < xEnd; j++) {
-                let index = (i * imageData.width + j) * 4;
+        for (var i = y; i < yEnd; i++) {
+            for (var j = x; j < xEnd; j++) {
+                var index = (i * imageData.width + j) * 4;
                 imageData.data[index] = color.r;
                 imageData.data[index + 1] = color.g;
                 imageData.data[index + 2] = color.b;
@@ -129,11 +133,11 @@ const canvasUtils = (function () {
     }
 
     function getImageData(file) {
-        let url = window.URL.createObjectURL(file);
-        let canvas = document.createElement('canvas');
-        let ctx = canvas.getContext("2d");
-        let image = new Image();
-        let promise = new window.Promise(function (resolve) {
+        var url = window.URL.createObjectURL(file);
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext("2d");
+        var image = new Image();
+        var promise = new window.Promise(function (resolve) {
             image.onload = function () {
                 canvas.width = image.width;
                 canvas.height = image.height;
@@ -146,14 +150,13 @@ const canvasUtils = (function () {
     }
 
     function onMouseDownDelta(canvas, callback) {
-        let x = -1;
-        let y = -1;
-        canvas.mousemove((e) => {
-
+        var x = -1;
+        var y = -1;
+        canvas.mousemove(function (e) {
             if (e.which === 1
                 && x !== -1 && y !== -1) {
-                let dx = e.pageX - x;
-                let dy = e.pageY - y;
+                var dx = e.pageX - x;
+                var dy = e.pageY - y;
                 callback(dx, dy);
             }
 
@@ -163,11 +166,11 @@ const canvasUtils = (function () {
     }
 
     function onMouseDownAbsolute(canvas, callback) {
-        canvas.mousemove((e) => {
-            let rect = canvas[0].getBoundingClientRect();
+        canvas.mousemove(function (e) {
+            var rect = canvas[0].getBoundingClientRect();
             if (e.which === 1) {
-                let x = e.pageX - rect.left;
-                let y = e.pageY - rect.top;
+                var x = e.pageX - rect.left;
+                var y = e.pageY - rect.top;
                 callback(x, y);
             }
         });
@@ -180,29 +183,29 @@ const canvasUtils = (function () {
     }
 
     function getSquareAtCoords(imageData, x, y) {
-        let w = 4;
-        let h = 4;
-        let dest = new Uint8ClampedArray(w * h * 4);
+        var w = 4;
+        var h = 4;
+        var dest = new Uint8ClampedArray(w * h * 4);
 
-        for (let i = 3; i < dest.length; i += 4) {
+        for (var i = 3; i < dest.length; i += 4) {
             dest[i] = 255;
         }
 
         x = x - x % 4;
         y = y - y % 4;
 
-        let xEnd = x + 4;
-        let yEnd = y + 4;
+        var xEnd = x + 4;
+        var yEnd = y + 4;
 
         if (xEnd > imageData.width) xEnd = imageData.width;
         if (yEnd > imageData.height) yEnd = imageData.height;
+        var i1 = 0;
+        for (i = y; i < yEnd; i++, i1++) {
+            for (var j = x, j1 = 0; j < xEnd; j++, j1++) {
+                var srcIndex = (i * imageData.width + j) * 4;
+                var destIndex = (i1 * w + j1) * 4;
 
-        for (let i = y, i1 = 0; i < yEnd; i++, i1++) {
-            for (let j = x, j1 = 0; j < xEnd; j++, j1++) {
-                let srcIndex = (i * imageData.width + j) * 4;
-                let destIndex = (i1 * w + j1) * 4;
-
-                for (let p = 0; p < 3; p++) {
+                for (var p = 0; p < 3; p++) {
                     dest[destIndex + p] = imageData.data[srcIndex + p]
                 }
             }
@@ -211,19 +214,61 @@ const canvasUtils = (function () {
         return new ImageData(dest, w, h)
     }
 
+    function get10BitImageData(raw) {
+        var reader = new FileReader();
+        return new window.Promise(function (resolve) {
+            reader.onload = function () {
+                var array = new Uint8Array(reader.result);
+                resolve(array);
+            };
+            reader.readAsArrayBuffer(raw);
+        });
+    }
+
+    function convertTo8bit(data, w, h) {
+        var w2 = w;
+        w = w / 2;
+        h = h / 2;
+
+        var dest = new Uint8ClampedArray(w * h * 4);
+
+        for (var i = 0; i < h; i++) {
+            for (var j = 0; j < w; j++) {
+                var index = (i * w2 * 2 + j * 2) * 2;
+
+                var r = (data[index + w2 * 2 + 2] + data[index + w2 * 2 + 3] * 256) / 4;
+                var g1 = (data[index + 2] + data[index + 3] * 256) / 4;
+                var g2 = (data[index + w2 * 2] + data[index + w2 * 2 + 1] * 256) / 4;
+                var g = (g1 + g2) / 2;
+                var b = (data[index] + data[index + 1] * 256) / 4;
+
+                var destIndex = (i * w + j) * 4;
+
+                dest[destIndex] = Math.floor(r);
+                dest[destIndex + 1] = Math.floor(g);
+                dest[destIndex + 2] = Math.floor(b);
+                dest[destIndex + 3] = 255;
+            }
+        }
+
+        return new ImageData(dest, w, h);
+    }
+
     // noinspection JSUnusedGlobalSymbols
     return {
-        getImage,
-        makeCanvasSquare,
-        drawIntoCanvas,
-        calcScale,
-        scaleImageData,
-        getImageData,
-        getPrescaledImageData,
+        getImage: getImage,
+        makeCanvasSquare: makeCanvasSquare,
+        drawIntoCanvas: drawIntoCanvas,
+        calcScale: calcScale,
+        scaleImageData: scaleImageData,
+        getImageData: getImageData,
+        getPrescaledImageData: getPrescaledImageData,
         onMouseDown: onMouseDownDelta,
         onMouseDownAbsolute: onMouseDownAbsolute,
-        onScroll,
-        getSquareAtCoords,
-        applyBorder
+        onScroll: onScroll,
+        getSquareAtCoords: getSquareAtCoords,
+        applyBorder: applyBorder,
+        get10BitImageData: get10BitImageData,
+        convertTo8bit: convertTo8bit
     }
 })();

@@ -35,19 +35,22 @@ $(document).ready(function () {
     onSelectOrDragImage()
         .then(function (file) {
             var dropZone = $(".drop-zone:first");
-            var tabs = $("#tabs");
+            var viewer = $(".viewer:first");
             dropZone.addClass("hidden");
-            tabs.removeClass("hidden");
-            return canvasUtils.getImageData(file);
+            viewer.removeClass("hidden");
+            return canvasUtils.get10BitImageData(file);
         })
-        .then(function (leftImageData) {
-            $("nav li a.active").first().parent().click();
-        });
-});
+        .then(function (_10BitImageData) {
 
-const imageData = (function () {
-    return {
-        left: null,
-        right: null
-    }
+            function showImage() {
+                var imageData = canvasUtils.convertTo8bit(_10BitImageData, 4192, 3104);
+                var scale = canvasUtils.calcScale(imageData, 1);
+                var canvas = $("#viewer");
+                canvasUtils.drawIntoCanvas(imageData, canvas, scale);
+            }
+
+            showImage();
+
+            $(window).resize(showImage);
+        });
 });
