@@ -15,19 +15,19 @@ block content
         .viewer.hidden
             .center
                 canvas#viewer
+                #circle.hidden
             #inputs.row
-                .center-horiz
-                    .col.s2
-                    .input-field.col.s2
-                        input#width.validate(type='text')
-                        label(for='width') Width
-                    .input-field.col.s2
-                        input#height.validate(type='text')
-                        label(for='height') Height
-                    .input-field.col.s2
-                        input#radius.validate(type='text')
-                        label(for='radius') Radius
-                    .input-field.col.s2
-                        input#num_points.validate(type='text')
-                        label(for='num_points') Number of points
-                    .col.s2
+                .col.s2
+                .input-field.col.s2
+                    input#width.validate(type='number')
+                    label(for='width') Width
+                .input-field.col.s2
+                    input#height.validate(type='number')
+                    label(for='height') Height
+                .input-field.col.s2
+                    input#radius.validate(type='number', value="5")
+                    label(for='radius') Radius
+                .input-field.col.s2
+                    input#num_points.validate(type='number')
+                    label(for='num_points') Number of points
+                .col.s2

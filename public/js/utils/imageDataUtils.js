@@ -148,37 +148,33 @@ const canvasUtils = (function () {
         return promise;
     }
 
-    function onMouseDownDelta(canvas, callback) {
-        var x = -1;
-        var y = -1;
+    function onMouseDownAbsolute(canvas, callback) {
         canvas.mousemove(function (e) {
-            if (e.which === 1
-                && x !== -1 && y !== -1) {
-                var dx = e.pageX - x;
-                var dy = e.pageY - y;
-                callback(dx, dy);
+            if (e.which === 1) {
+                callback(e.pageX, e.pageY);
             }
-
-            x = e.pageX;
-            y = e.pageY;
         });
     }
 
-    function onMouseDownAbsolute(canvas, callback) {
-        canvas.mousemove(function (e) {
-            var rect = canvas[0].getBoundingClientRect();
-            if (e.which === 1) {
-                var x = e.pageX - rect.left;
-                var y = e.pageY - rect.top;
-                callback(x, y);
-            }
+    function onMouseMoveAbsolute(canvas, callback) {
+        $(document.body).mousemove(function (e) {
+            var canvasPos = canvas.offset();
+            callback(e.pageX, e.pageY - canvasPos.top);
         });
     }
 
     function onScroll(canvas, callback) {
-        canvas.bind('mousewheel', function (e) {
-            callback(e.originalEvent.wheelDelta);
+        $(document.body).bind('mousewheel', function (e) {
+            var rect = canvas[0].getBoundingClientRect();
+            if (canvasUtils.ptInRect(e.pageX,  e.pageY, rect)) {
+                callback(e.originalEvent.wheelDelta);
+            }
         });
+    }
+    
+    function ptInRect(x, y, rect) {
+        return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+
     }
 
     function getSquareAtCoords(imageData, x, y) {
@@ -262,12 +258,13 @@ const canvasUtils = (function () {
         scaleImageData: scaleImageData,
         getImageData: getImageData,
         getPrescaledImageData: getPrescaledImageData,
-        onMouseDown: onMouseDownDelta,
+        onMouseMoveAbsolute: onMouseMoveAbsolute,
         onMouseDownAbsolute: onMouseDownAbsolute,
         onScroll: onScroll,
         getSquareAtCoords: getSquareAtCoords,
         applyBorder: applyBorder,
         get10BitImageData: get10BitImageData,
-        convertTo8bit: convertTo8bit
+        convertTo8bit: convertTo8bit,
+        ptInRect: ptInRect
     }
 })();

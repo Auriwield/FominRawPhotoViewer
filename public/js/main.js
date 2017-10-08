@@ -41,16 +41,56 @@ $(document).ready(function () {
             return canvasUtils.get10BitImageData(file);
         })
         .then(function (_10BitImageData) {
+            var canvas = $("#viewer");
+            var circle = $("#circle");
+            var radius = $("#radius");
+            var circleX = 0, circleY = 0;
+
+            function updateCircle() {
+                var rad = parseInt(radius.val());
+                var diameter = rad * 2;
+                var x = circleX - rad;
+                var y = circleY - rad;
+
+                circle.css("width", diameter);
+                circle.css("height", diameter);
+                circle.css("left", x);
+                circle.css("top", y);
+            }
+
+            radius.change(updateCircle);
+
+            canvasUtils.onScroll(canvas, function (delta) {
+                var v = parseFloat(radius.val()) * (1 + delta / 2000);
+                v = Math.floor(v * 100) / 100;
+                if (v < 3 || v > Math.min(canvas[0].width, canvas[0].height)) return;
+                radius.val(v);
+                updateCircle();
+            });
+
+            canvasUtils.onMouseMoveAbsolute(canvas, function (x, y) {
+                var rect = canvas[0].getBoundingClientRect();
+                var canvasPos = canvas.offset();
+                if (!canvasUtils.ptInRect(x, y + canvasPos.top, rect)) {
+                    circle.addClass("hidden");
+                    return;
+                }
+                circle.removeClass("hidden");
+                circleX = x;
+                circleY = y;
+                updateCircle();
+            });
+
 
             function showImage() {
                 var imageData = canvasUtils.convertTo8bit(_10BitImageData, 4192, 3104);
                 var scale = canvasUtils.calcScale(imageData);
-                var canvas = $("#viewer");
                 canvasUtils.drawIntoCanvas(imageData, canvas, scale);
             }
 
             showImage();
 
             $(window).resize(showImage);
+
         });
 });
