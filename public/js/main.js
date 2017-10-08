@@ -53,7 +53,7 @@ function onSelectOrDragImage() {
     });
 }
 
-$(document).ready(function () {
+var main = function () {
     onSelectOrDragImage()
         .then(function (file) {
             var dropZone = $(".drop-zone:first");
@@ -150,6 +150,7 @@ $(document).ready(function () {
                 var imageData = canvasUtils.convertTo8bit(_10BitImageData, w, h);
                 scale = canvasUtils.calcScale(imageData);
                 canvasUtils.drawIntoCanvas(imageData, canvas, scale);
+                $("#download")[0].href = canvas[0].toDataURL();
             }
 
             showImage();
@@ -158,5 +159,9 @@ $(document).ready(function () {
             inputHeight.change(showImage);
             $(window).resize(showImage);
 
+            $("#clear").click(function () {
+                location.reload();
+            })
         });
-});
+};
+$(document).ready(main);

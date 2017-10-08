@@ -18,6 +18,7 @@ block content
             #circle.hidden
             #inputs.row
                 .col.s2
+                    i#clear.material-icons clear
                 .input-field.col.s2
                     input#width.validate(type='number', step="1", min="0")
                     label(for='width') Width
@@ -28,6 +29,8 @@ block content
                     input#radius.validate(type='number', value="5", step="any", min="3")
                     label(for='radius') Radius
                 .input-field.col.s2
-                    input#num_points.validate(type='number', step="1", min="0")
+                    input#num_points.validate(type='number', step="1", min="0", value="10")
                     label(for='num_points') Points
                 .col.s2
+                    a#download(href="path_to_file", download="image")
+                        i.material-icons arrow_downward
