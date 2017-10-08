@@ -222,8 +222,8 @@ const canvasUtils = (function () {
 
     function convertTo8bit(data, w, h) {
         var w2 = w;
-        w = w / 2;
-        h = h / 2;
+        w = Math.floor(w / 2);
+        h = Math.floor(h / 2);
 
         var dest = new Uint8ClampedArray(w * h * 4);
 

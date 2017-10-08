@@ -19,15 +19,15 @@ block content
             #inputs.row
                 .col.s2
                 .input-field.col.s2
-                    input#width.validate(type='number')
+                    input#width.validate(type='number', step="1", min="0")
                     label(for='width') Width
                 .input-field.col.s2
-                    input#height.validate(type='number')
+                    input#height.validate(type='number', step="1", min="0")
                     label(for='height') Height
                 .input-field.col.s2
-                    input#radius.validate(type='number', value="5")
+                    input#radius.validate(type='number', value="5", step="any", min="3")
                     label(for='radius') Radius
                 .input-field.col.s2
-                    input#num_points.validate(type='number')
-                    label(for='num_points') Number of points
+                    input#num_points.validate(type='number', step="1", min="0")
+                    label(for='num_points') Points
                 .col.s2
