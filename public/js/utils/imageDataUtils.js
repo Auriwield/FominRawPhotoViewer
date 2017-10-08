@@ -1,11 +1,5 @@
 const canvasUtils = (function () {
 
-    // noinspection JSUnusedGlobalSymbols
-    function getImage(canvas, imageData) {
-        drawIntoCanvas(imageData, canvas, 1.0);
-        return canvas[0].toDataURL();
-    }
-
     function drawIntoCanvas(imageData, canvas, scale) {
         var ctx = canvas[0].getContext("2d");
         if (!scale) scale = calcScale(imageData);
@@ -20,31 +14,12 @@ const canvasUtils = (function () {
         ctx.putImageData(imageData, 0, 0);
     }
 
-    function makeCanvasSquare(canvas, subw, subh) {
-        if (!subw) subw = 0;
-        if (!subh) subh = 0;
-
-        var maxWidth = $(window).width() * 0.9 - subw;
-        var maxHeight = ($(window).height() - $(".header").height()) * 0.9 - subh;
-
-        var side = Math.min(maxWidth, maxHeight);
-
-        canvas[0].width = side;
-        canvas[0].height = side;
-    }
-
     function calcScale(imageData) {
         var maxWidth = $(window).width() * 0.9;
         var maxHeight = ($(window).height() - $(".header").height() - $("#inputs").height()) * 0.9;
         var mpX = maxWidth / imageData.width;
         var mpY = maxHeight / imageData.height;
         return Math.min(mpX, mpY);
-    }
-
-    function getPrescaledImageData() {
-        var maxWidth = Math.floor($(window).width() * 0.8);
-        var maxHeight = Math.floor(($(window).height() - $(".header").height()) * 0.8);
-        return new ImageData(new Uint8ClampedArray(maxWidth * maxHeight * 4), maxWidth, maxHeight);
     }
 
     function scaleImageData(imageData, scale) {
@@ -86,51 +61,6 @@ const canvasUtils = (function () {
         return new ImageData(dest, w2, h2);
     }
 
-    function applyBorder(imageData, t, color) {
-        var w = imageData.width + t;
-        var h = imageData.height + t;
-
-        var dest = new Uint8ClampedArray(w * h * 4);
-
-        for (var i = 0; i < imageData.height; i++) {
-            for (var j = 0; j < imageData.width; j++) {
-                var srcIndex = (i * imageData.width + j) * 4;
-                var destIndex = ((i + t) * w + j + t) * 4;
-                for (var p = 0; p < 4; p++) {
-                    dest[destIndex + p] = imageData.data[srcIndex + p]
-                }
-                destIndex += 4;
-            }
-        }
-
-        var data = new ImageData(dest, w, h);
-
-        fillRectangle(data, 0, 0, w, t, color);
-        fillRectangle(data, 0, t, t, h - t * 2, color);
-        fillRectangle(data, w - t, t, t, h - t * 2, color);
-        fillRectangle(data, 0, h - t, w, t, color);
-
-        return data;
-    }
-
-    function fillRectangle(imageData, x, y, width, height, color) {
-        var yEnd = y + height;
-        var xEnd = x + width;
-
-        if (yEnd > imageData.height) yEnd = imageData.height;
-        if (xEnd > imageData.width) xEnd = imageData.width;
-
-        for (var i = y; i < yEnd; i++) {
-            for (var j = x; j < xEnd; j++) {
-                var index = (i * imageData.width + j) * 4;
-                imageData.data[index] = color.r;
-                imageData.data[index + 1] = color.g;
-                imageData.data[index + 2] = color.b;
-                imageData.data[index + 3] = color.a;
-            }
-        }
-    }
-
     function getImageData(file) {
         var url = window.URL.createObjectURL(file);
         var canvas = document.createElement('canvas');
@@ -148,65 +78,34 @@ const canvasUtils = (function () {
         return promise;
     }
 
-    function onMouseDownAbsolute(canvas, callback) {
-        canvas.mousemove(function (e) {
+    function onMouseClick(canvas, callback) {
+        $(document.body).click(function (e) {
             if (e.which === 1) {
-                callback(e.pageX, e.pageY);
+                var rect = canvas[0].getBoundingClientRect();
+                if (!canvasUtils.ptInRect(e.pageX, e.pageY, rect)) return;
+                callback(e.pageX - rect.left, e.pageY - rect.top);
             }
         });
     }
 
     function onMouseMoveAbsolute(canvas, callback) {
         $(document.body).mousemove(function (e) {
-            var canvasPos = canvas.offset();
-            callback(e.pageX, e.pageY - canvasPos.top);
+            callback(e.pageX, e.pageY);
         });
     }
 
     function onScroll(canvas, callback) {
         $(document.body).bind('mousewheel', function (e) {
             var rect = canvas[0].getBoundingClientRect();
-            if (canvasUtils.ptInRect(e.pageX,  e.pageY, rect)) {
+            if (canvasUtils.ptInRect(e.pageX, e.pageY, rect)) {
                 callback(e.originalEvent.wheelDelta);
             }
         });
     }
-    
+
     function ptInRect(x, y, rect) {
         return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
 
-    }
-
-    function getSquareAtCoords(imageData, x, y) {
-        var w = 4;
-        var h = 4;
-        var dest = new Uint8ClampedArray(w * h * 4);
-
-        for (var i = 3; i < dest.length; i += 4) {
-            dest[i] = 255;
-        }
-
-        x = x - x % 4;
-        y = y - y % 4;
-
-        var xEnd = x + 4;
-        var yEnd = y + 4;
-
-        if (xEnd > imageData.width) xEnd = imageData.width;
-        if (yEnd > imageData.height) yEnd = imageData.height;
-        var i1 = 0;
-        for (i = y; i < yEnd; i++, i1++) {
-            for (var j = x, j1 = 0; j < xEnd; j++, j1++) {
-                var srcIndex = (i * imageData.width + j) * 4;
-                var destIndex = (i1 * w + j1) * 4;
-
-                for (var p = 0; p < 3; p++) {
-                    dest[destIndex + p] = imageData.data[srcIndex + p]
-                }
-            }
-        }
-
-        return new ImageData(dest, w, h)
     }
 
     function get10BitImageData(raw) {
@@ -249,22 +148,88 @@ const canvasUtils = (function () {
         return new ImageData(dest, w, h);
     }
 
-    // noinspection JSUnusedGlobalSymbols
+    function balanceWhite(data, w, h, x, y, rad, numOfPoints) {
+        var w2 = w;
+        w = Math.floor(w / 2);
+        h = Math.floor(h / 2);
+
+        var ar = 0;
+        var ag = 0;
+        var ab = 0;
+        for (var n = 0; n < numOfPoints; n++) {
+            var a = getRandom(0, Math.PI * 2);
+            var ra = getRandom(0, rad);
+            var x1 = Math.floor(Math.cos(a) * ra + x);
+            var y1 = Math.floor(Math.sin(a) * ra + y);
+
+            var index = (y1 * w2 * 2 + x1 * 2) * 2;
+            ar += data[index + w2 * 2 + 2] + data[index + w2 * 2 + 3] * 256;
+
+            var ag1 = data[index + 2] + data[index + 3] * 256;
+            var ag2 = data[index + w2 * 2] + data[index + w2 * 2 + 1] * 256;
+            ag += (ag1 + ag2) / 2;
+            ab += data[index] + data[index + 1] * 256;
+        }
+
+        ar /= numOfPoints;
+        ag /= numOfPoints;
+        ab /= numOfPoints;
+
+        var kr = 1023 / ar;
+        var kg = 1023 / ag;
+        var kb = 1023 / ab;
+
+        var dest = new Uint8ClampedArray(data.length);
+
+        for (var i = 0; i < h; i++) {
+            for (var j = 0; j < w; j++) {
+                index = (i * w2 * 2 + j * 2) * 2;
+
+                var r = data[index + w2 * 2 + 2] + data[index + w2 * 2 + 3] * 256;
+                var g1 = data[index + 2] + data[index + 3] * 256;
+                var g2 = data[index + w2 * 2] + data[index + w2 * 2 + 1] * 256;
+                var b = data[index] + data[index + 1] * 256;
+
+                r *= kr;
+                g1 *= kg;
+                g2 *= kg;
+                b *= kb;
+
+                if (r > 1023) r = 1024;
+                if (g1 > 1023) g1 = 1023;
+                if (g2 > 1023) g2 = 1023;
+                if (b > 1023) b = 1023;
+                //r
+                dest[index + w2 * 2 + 2] = r % 256;
+                dest[index + w2 * 2 + 3] = r >> 8;
+                //g1
+                dest[index + 2] = g1 % 256;
+                dest[index + 3] = g1 >> 8;
+                //g2
+                dest[index + w2 * 2] = g2 % 256;
+                dest[index + w2 * 2 + 1] = g2 >> 8;
+                //b
+                dest[index] = b % 256;
+                dest[index + 1] = b >> 8;
+            }
+        }
+        return dest;
+    }
+
+    function getRandom(a, b) {
+        return a + Math.random() * b;
+    }
+
     return {
-        getImage: getImage,
-        makeCanvasSquare: makeCanvasSquare,
         drawIntoCanvas: drawIntoCanvas,
         calcScale: calcScale,
-        scaleImageData: scaleImageData,
         getImageData: getImageData,
-        getPrescaledImageData: getPrescaledImageData,
         onMouseMoveAbsolute: onMouseMoveAbsolute,
-        onMouseDownAbsolute: onMouseDownAbsolute,
+        onMouseClick: onMouseClick,
         onScroll: onScroll,
-        getSquareAtCoords: getSquareAtCoords,
-        applyBorder: applyBorder,
         get10BitImageData: get10BitImageData,
         convertTo8bit: convertTo8bit,
-        ptInRect: ptInRect
+        ptInRect: ptInRect,
+        balanceWhite: balanceWhite
     }
 })();

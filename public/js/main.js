@@ -69,9 +69,10 @@ $(document).ready(function () {
             var radius = $("#radius");
             var circleX = 0, circleY = 0;
             var minRadius = 3;
+            var scale = 1;
 
             function updateCircle() {
-                var rad = parseFloat(radius.val());
+                var rad = parseInt(radius.val());
                 var maxRadius = Math.min(canvas[0].width, canvas[0].height) / 2;
 
                 if (rad > maxRadius) {
@@ -89,17 +90,16 @@ $(document).ready(function () {
                 var y = circleY - rad;
 
                 var rect = canvas[0].getBoundingClientRect();
-                var yOffset = canvas.offset().top;
 
                 if (x < rect.left) x = rect.left;
-                if (x + diameter > rect.right) x = rect.right - diameter;
-                if (y + yOffset < rect.top) y = rect.top - yOffset;
-                if (y + yOffset + diameter > rect.bottom) y = rect.bottom - yOffset - diameter;
+                if (x + diameter > rect.right - 2) x = rect.right - diameter - 2;
+                if (y < rect.top) y = rect.top;
+                if (y + diameter > rect.bottom - 2) y = rect.bottom - diameter - 2;
 
-                circle.css("width", diameter);
-                circle.css("height", diameter);
-                circle.css("left", x);
-                circle.css("top", y);
+                circle.css("width", diameter - 2);
+                circle.css("height", diameter - 2);
+                circle.css("left", Math.floor(x));
+                circle.css("top", Math.floor(y));
             }
 
             radius.change(updateCircle);
@@ -116,8 +116,7 @@ $(document).ready(function () {
 
             canvasUtils.onMouseMoveAbsolute(canvas, function (x, y) {
                 var rect = canvas[0].getBoundingClientRect();
-                var canvasPos = canvas.offset();
-                if (!canvasUtils.ptInRect(x, y + canvasPos.top, rect)) {
+                if (!canvasUtils.ptInRect(x, y, rect)) {
                     circle.addClass("hidden");
                     body.removeClass("no-cursor");
                     return;
@@ -129,15 +128,27 @@ $(document).ready(function () {
                 updateCircle();
             });
 
+            canvasUtils.onMouseClick(canvas, function (x, y) {
+                var rad = parseInt(radius.val());
+                var w = parseInt($("#width").val());
+                var h = parseInt($("#height").val());
+                var points = parseInt($("#num_points").val());
+                if (!w || !h || !points) return;
+                x /= scale;
+                y /= scale;
+                _10BitImageData = canvasUtils.balanceWhite(_10BitImageData, w, h, x, y, rad, points);
+                showImage();
+            });
+
             var inputWidth = $("#width");
             var inputHeight = $("#height");
 
             function showImage() {
                 var w = inputWidth.val();
                 var h = inputHeight.val();
-                if (w === 0 || h === 0) return;
+                if (!w || !h) return;
                 var imageData = canvasUtils.convertTo8bit(_10BitImageData, w, h);
-                var scale = canvasUtils.calcScale(imageData);
+                scale = canvasUtils.calcScale(imageData);
                 canvasUtils.drawIntoCanvas(imageData, canvas, scale);
             }
 
