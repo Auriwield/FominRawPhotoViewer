@@ -52,9 +52,17 @@ nav a.brand-logo {
 .center {
   position: relative;
   left: 50%;
-  top: 50%;
+  top: 46%;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
+  line-height: 0.0;
+}
+
+.center-horiz {
+  position: relative;
+  left: 50%;
+  -webkit-transform: translate(-50%, 0%);
+  transform: translate(-50%, 0%);
   line-height: 0.0;
 }
 
@@ -87,6 +95,23 @@ a#preview:hover {
 
 .hidden {
   display: none !important;
+}
+
+canvas#viewer:hover {
+  //cursor: none;
+}
+
+#inputs {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  margin-bottom: 0 !important;
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+#inputs input {
+  margin-bottom: 15px !important;
 }
 
 /*

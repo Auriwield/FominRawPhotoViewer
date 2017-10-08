@@ -44,7 +44,7 @@ $(document).ready(function () {
 
             function showImage() {
                 var imageData = canvasUtils.convertTo8bit(_10BitImageData, 4192, 3104);
-                var scale = canvasUtils.calcScale(imageData, 1);
+                var scale = canvasUtils.calcScale(imageData);
                 var canvas = $("#viewer");
                 canvasUtils.drawIntoCanvas(imageData, canvas, scale);
             }

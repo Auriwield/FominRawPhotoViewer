@@ -33,10 +33,9 @@ const canvasUtils = (function () {
         canvas[0].height = side;
     }
 
-    function calcScale(imageData, multiplier) {
-        if (!multiplier) multiplier = 2;
-        var maxWidth = $(window).width() / multiplier * 0.9;
-        var maxHeight = ($(window).height() - $(".header").height()) * 0.9;
+    function calcScale(imageData) {
+        var maxWidth = $(window).width() * 0.9;
+        var maxHeight = ($(window).height() - $(".header").height() - $("#inputs").height()) * 0.9;
         var mpX = maxWidth / imageData.width;
         var mpY = maxHeight / imageData.height;
         return Math.min(mpX, mpY);
