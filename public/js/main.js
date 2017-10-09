@@ -63,6 +63,7 @@ var main = function () {
             return canvasUtils.get10BitImageData(file);
         })
         .then(function (_10BitImageData) {
+            var modifiedImageData;
             var body = $(document.body);
             var canvas = $("#viewer");
             var circle = $("#circle");
@@ -136,7 +137,7 @@ var main = function () {
                 if (!w || !h || !points) return;
                 x /= scale;
                 y /= scale;
-                _10BitImageData = canvasUtils.balanceWhite(_10BitImageData, w, h, x, y, rad, points);
+                modifiedImageData = canvasUtils.balanceWhite(_10BitImageData, w, h, x, y, rad, points);
                 showImage();
             });
 
@@ -147,7 +148,8 @@ var main = function () {
                 var w = inputWidth.val();
                 var h = inputHeight.val();
                 if (!w || !h) return;
-                var imageData = canvasUtils.convertTo8bit(_10BitImageData, w, h);
+                var data = modifiedImageData ? modifiedImageData : _10BitImageData;
+                var imageData = canvasUtils.convertTo8bit(data, w, h);
                 scale = canvasUtils.calcScale(imageData);
                 canvasUtils.drawIntoCanvas(imageData, canvas, scale);
                 $("#download")[0].href = canvas[0].toDataURL();
