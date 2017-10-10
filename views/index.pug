@@ -14,8 +14,11 @@ block content
                 input#fake-button(type="file", accept=".bin")
         .viewer.hidden
             .center
-                canvas#viewer
+                canvas#viewer.hidden
             #circle.hidden
+            .center.fixed
+                #progress.hidden
+                    include progress
             #inputs.row
                 .col.s2
                     i#clear.material-icons clear

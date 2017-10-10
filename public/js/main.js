@@ -57,9 +57,9 @@ var main = function () {
     onSelectOrDragImage()
         .then(function (file) {
             var dropZone = $(".drop-zone:first");
-            var viewer = $(".viewer:first");
             dropZone.addClass("hidden");
-            viewer.removeClass("hidden");
+            $(".viewer:first").removeClass("hidden");
+            $("#progress").removeClass("hidden");
             return canvasUtils.get10BitImageData(file);
         })
         .then(function (_10BitImageData) {
@@ -151,7 +151,10 @@ var main = function () {
                 var data = modifiedImageData ? modifiedImageData : _10BitImageData;
                 var imageData = canvasUtils.convertTo8bit(data, w, h);
                 scale = canvasUtils.calcScale(imageData);
+                $("#progress").addClass("hidden");
+                $("#viewer").removeClass("hidden");
                 canvasUtils.drawIntoCanvas(imageData, canvas, scale);
+
                 $("#download")[0].href = canvas[0].toDataURL();
             }
 
